@@ -1,0 +1,113 @@
+<!--
+  #%L
+  Wisdom-Framework
+  %%
+  Copyright (C) 2013 - 2015 Wisdom Framework
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+<!DOCTYPE html>
+<html layout:decorator="layout">
+<head lang="en">
+    <title>Requests monitor</title>
+
+    <link rel="stylesheet" href="/assets/table.css"/>
+    <link href="/assets/dashboard.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/assets/libs/codemirror/codemirror.css"/>
+    <link rel="stylesheet" href="/assets/libs/codemirror/yeti.css"/>
+    <!-- Create a simple CodeMirror instance -->
+    <script src="/assets/libs/codemirror/codemirror.js"></script>
+    <script src="/assets/libs/codemirror/matchbrackets.js"></script>
+    <script src="/assets/libs/codemirror/groovy.js"></script>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="alert alert-warning alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>
+        <p>The purpose of requests monitor is to provide visibility on executed requests on the server and their
+            execution time stats.</p>
+    </div>
+    <h1 class="page-header">Configuration</h1>
+    <form action="/monitor/requests/configure" method="POST" style="margin-left:10px;">
+        <div class="form-group">
+            <label for="filterURI">Filter URI (regex format)</label>
+            <input type="text" class="form-control" name="filterURI" id="filterURI" th:value="${filterURI}"/>
+        </div>
+        <button type="submit" class="btn btn-primary">Update configuration</button>
+    </form>
+    <h1 class="page-header">Stats</h1>
+    <form action="/monitor/requests/compute" method="POST" style="margin-left:10px;">
+        <button type="submit" class="btn btn-primary">Compute stats</button>
+    </form>
+    <div class="row">
+        <table class="table table-striped table-condensed">
+            <thead>
+            <th>Route</th>
+            <th>Method</th>
+            <th>Min duration (ms)</th>
+            <th>Average duration (ms)</th>
+            <th>Max duration (ms)</th>
+            <th>Number of requests</th>
+            </thead>
+            <tbody>
+            <tr th:each="entry: ${entries}">
+                <td th:text="${entry.getKey().getRoute()}">
+                </td>
+                <td th:text="${entry.getKey().getMethod()}">
+                </td>
+                <td th:text="${entry.getValue().getMinDuration()}">
+                </td>
+                <td th:text="${entry.getValue().getAverageDuration()}">
+                </td>
+                <td th:text="${entry.getValue().getMaxDuration()}">
+                </td>
+                <td th:text="${entry.getValue().getNumberOfRequests()}">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <h1 class="page-header">Requests</h1>
+    <form action="/monitor/requests/clear" method="POST" style="margin-left:10px;">
+        <button type="submit" class="btn btn-danger">Clear requests</button>
+    </form>
+    <div class="row">
+        <table class="table table-striped table-condensed">
+            <thead>
+            <th>Execution date</th>
+            <th>Route</th>
+            <th>Method</th>
+            <th>URL</th>
+            <th>Duration (ms)</th>
+            </thead>
+            <tbody>
+            <tr th:each="request: ${requests}">
+                <td th:text="${request.getExecutionTime()}">
+                </td>
+                <td th:text="${request.getRoute()}">
+                </td>
+                <td th:text="${request.getMethod()}">
+                </td>
+                <td th:text="${request.getUrl()}">
+                </td>
+                <td th:text="${request.getDuration()}">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
