@@ -16,6 +16,19 @@
 
     <packaging>pom</packaging>
 
+    <distributionManagement>
+        <repository>
+            <id>maven-s3-release-repo</id>
+            <name>AWS Release Repository</name>
+            <url>s3://dooapp-maven-repo/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven-s3-snapshot-repo</id>
+            <name>AWS Snapshot Repository</name>
+            <url>s3://dooapp-maven-repo/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <name>wisdom-extensions</name>
 
     <description>dooApp extensions for the wisdom-framework</description>
@@ -70,4 +83,13 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <build>
+        <extensions>
+            <extension>
+                <groupId>org.springframework.build</groupId>
+                <artifactId>aws-maven</artifactId>
+                <version>5.0.0.RELEASE</version>
+            </extension>
+        </extensions>
+    </build>
 </project>
