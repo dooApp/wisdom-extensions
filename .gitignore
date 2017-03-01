@@ -1,5 +1,6 @@
 target/
 target
+target*
 target/*
 target/**
 *.ipr
@@ -26,6 +27,7 @@ nbactions.xml
 .DS_Store
 Icon?
 atlassian-ide-plugin.xml
+LOG_PATH_IS_UNDEFINED
 
 # Word tmp
 ~$*
@@ -38,6 +40,3 @@ atlassian-ide-plugin.xml
 .Trashes
 
 velocity.log
-log/*
-log/**
-log

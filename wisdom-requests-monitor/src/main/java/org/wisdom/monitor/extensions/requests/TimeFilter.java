@@ -23,13 +23,15 @@ import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
+import org.wisdom.api.http.AsyncResult;
 import org.wisdom.api.http.Result;
 import org.wisdom.api.interception.Filter;
 import org.wisdom.api.interception.RequestContext;
 import org.wisdom.api.router.Route;
-import org.wisdom.monitor.extensions.requests.service.RequestStorageService;
 import org.wisdom.monitor.extensions.requests.model.TimeRequest;
+import org.wisdom.monitor.extensions.requests.service.RequestStorageService;
 
+import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 /**
@@ -48,14 +50,25 @@ public class TimeFilter implements Filter {
     @Override
     public Result call(Route route, RequestContext context) throws Exception {
         final long begin = System.currentTimeMillis();
-        try {
-            return context.proceed();
-        } finally {
+        Result result = context.proceed();
+        if (result instanceof AsyncResult) {
+            Callable<Result> originalCallable = ((AsyncResult) result).callable();
+            Callable<Result> wrapped = () -> {
+                Result originalResult = originalCallable.call();
+                final long end = System.currentTimeMillis();
+                TimeRequest timeRequest = new TimeRequest(begin, context.request().uri(), route.getUrl(), context.request().method(), end - begin);
+                requestStorageService.getRequests().add(timeRequest);
+                requestStorageService.commit();
+                return originalResult;
+            };
+            return new AsyncResult(wrapped);
+        } else {
             final long end = System.currentTimeMillis();
             TimeRequest timeRequest = new TimeRequest(begin, context.request().uri(), route.getUrl(), context.request().method(), end - begin);
             requestStorageService.getRequests().add(timeRequest);
             requestStorageService.commit();
         }
+        return result;
     }
 
     /**
